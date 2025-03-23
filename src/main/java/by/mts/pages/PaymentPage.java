@@ -4,7 +4,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.JavascriptExecutor;
-import org.testng.Assert;
+import org.assertj.core.api.Assertions;
+
+
 
 public class PaymentPage extends BasePage {
 
@@ -18,14 +20,22 @@ public class PaymentPage extends BasePage {
 
     public void checkPayBlock() {
         WebElement payBlock = find(Locators.PAY_BLOCK_NAME);
-        Assert.assertNotNull(payBlock, "Блок с платежной информацией не найден.");
+        Assertions.assertThat(payBlock)
+                .withFailMessage("Блок с платежной информацией не найден.")
+                .isNotNull();
     }
+
+
 
     public void checkPayBlockName(String expectedTitle) {
         WebElement payBlockTitle = find(Locators.PAY_BLOCK_NAME);
         String actualTitle = payBlockTitle.getText();
-        Assert.assertEquals(actualTitle, expectedTitle, "Название блока не соответствует ожидаемому");
+        Assertions.assertThat(actualTitle)
+                .withFailMessage("Название блока не соответствует ожидаемому")
+                .isEqualTo(expectedTitle);
     }
+
+
 
     public void selectService(String serviceName) {
         try {
@@ -35,7 +45,7 @@ public class PaymentPage extends BasePage {
             System.out.println("Услуга \"" + serviceName + "\" успешно выбрана.");
         } catch (Exception e) {
             System.out.println("Ошибка при выборе услуги: " + e.getMessage());
-            Assert.fail("Не удалось выбрать услугу: " + serviceName);
+            Assertions.fail("Не удалось выбрать услугу: " + serviceName);
         }
     }
 
@@ -43,8 +53,13 @@ public class PaymentPage extends BasePage {
         WebElement selectedService = find(Locators.SELECTED_SERVICE_TEXT);
         String actualServiceName = selectedService.getText();
         System.out.println("Фактическое название выбранной услуги: " + actualServiceName);
-        Assert.assertEquals(actualServiceName, expectedServiceName, "Ошибка: неверно выбрана услуга");
+
+        Assertions.assertThat(actualServiceName)
+                .withFailMessage("Ошибка: неверно выбрана услуга")
+                .isEqualTo(expectedServiceName);
     }
+
+
 
     public void clearFields(By phoneFieldLocator, By amountFieldLocator, By emailFieldLocator) {
         try {
@@ -70,7 +85,9 @@ public class PaymentPage extends BasePage {
 
     public void checkAndClickButton(By locator) {
         try {
-            Assert.assertTrue(isElementVisible(locator), "Кнопка не видна");
+            Assertions.assertThat(isElementVisible(locator))
+                    .as("Кнопка не видна")
+                    .isTrue();
             click(locator);
             System.out.println("Кнопка по локатору " + locator + " успешно кликнута.");
         } catch (Exception e) {
@@ -78,10 +95,14 @@ public class PaymentPage extends BasePage {
         }
     }
 
+
     public void checkLogoVisibility(By locator, String logoName) {
         boolean isVisible = isElementVisible(locator);
-        Assert.assertTrue(isVisible, logoName + " логотип не виден.");
+        Assertions.assertThat(isVisible)
+                .as(logoName + " логотип не виден.")
+                .isTrue();
     }
+
 
     public void verifyService(String serviceName, String phoneFieldPlaceholder, String amountFieldPlaceholder, String emailFieldPlaceholder) {
         selectService(serviceName);
@@ -124,14 +145,23 @@ public class PaymentPage extends BasePage {
         }
     }
 
-
     private void checkPlaceholder(By locator, String expectedPlaceholder) {
         WebElement field = find(locator);
-        Assert.assertNotNull(field, "Поле не найдено: " + locator);
+        Assertions.assertThat(field)
+                .as("Поле не найдено: " + locator)
+                .isNotNull();
+
         String actualPlaceholder = (String) ((JavascriptExecutor) driver).executeScript(
                 "return arguments[0].getAttribute('placeholder');", field);
-        Assert.assertNotNull(actualPlaceholder, "Плейсхолдер отсутствует у поля: " + locator);
-        Assert.assertEquals(actualPlaceholder, expectedPlaceholder, "Ошибка в плейсхолдере для " + locator);
+
+        Assertions.assertThat(actualPlaceholder)
+                .as("Плейсхолдер отсутствует у поля: " + locator)
+                .isNotNull();
+
+        Assertions.assertThat(actualPlaceholder)
+                .as("Ошибка в плейсхолдере для " + locator)
+                .isEqualTo(expectedPlaceholder);
+
         System.out.println("Плейсхолдер для поля " + locator + " проверен успешно: " + actualPlaceholder);
     }
 
